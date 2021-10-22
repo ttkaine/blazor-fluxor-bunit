@@ -1,0 +1,38 @@
+﻿@using Fluxor
+@using SystemUnderTest.Blazor.Store
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IState<SystemState> _state
+@inject IDispatcher _dispatcher
+
+
+<h1>The Number is: @_state.Value.Number</h1>
+<MessageDisplay Message="@message"></MessageDisplay>
+@if (!string.IsNullOrWhiteSpace(_state.Value.Error))
+{
+    <p>ERROR!!! @_state.Value.Error</p>
+}
+<input type="number" @bind="@editNumber"/>
+<button @onclick="UpdateNumber" >Click me</button>
+
+@code {
+
+    int editNumber;
+    string message = "";
+
+    private void UpdateNumber()
+    {
+        _dispatcher.Dispatch(new UpdateNumberAction(editNumber));
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        SubscribeToAction<UpdateNumberSuccessAction>(NumberUpdated);
+        await base.OnInitializedAsync();
+    }
+
+    private void NumberUpdated(UpdateNumberSuccessAction obj)
+    {
+        message = $"The number has been updated: {obj.Number} at {obj.Date}";
+    }
+
+}

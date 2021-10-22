@@ -1,0 +1,10 @@
+﻿@if (!string.IsNullOrWhiteSpace(Message))
+{
+    <h3>Message</h3>
+    <p>@Message</p>
+}
+
+@code {
+    [Parameter]
+    public string Message { get; set; }
+}

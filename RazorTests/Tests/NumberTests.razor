@@ -1,0 +1,56 @@
+﻿@using NUnit.Framework
+@using Bunit
+@using Fluxor
+@using Microsoft.EntityFrameworkCore.Infrastructure
+@using Microsoft.Extensions.DependencyInjection
+@using Moq
+@using SystemUnderTest.Blazor.Store
+@inherits BaseTest
+
+
+@code {
+
+    [Test]
+    public async Task NumberComponentHasAMessage()
+    {
+        var cut = Render(@<NumberComponent></NumberComponent>);
+
+        Assert.IsTrue(cut.HasComponent<MessageDisplay>());
+    }
+
+
+    [Test]
+    public async Task IfErrorMessageIsNotEmptyThenErrorShows()
+    {
+        string errorMessage = "There is an error";
+        Mock<IState<SystemState>> mockState = new Mock<IState<SystemState>>();
+        mockState.Setup(s => s.Value).Returns(new SystemState
+        {
+            Error = errorMessage
+        });
+
+        TestContext.Services.AddTransient<IState<SystemState>>(sp => mockState.Object);
+
+        var cut = Render(@<NumberComponent></NumberComponent>);
+
+        Assert.IsTrue(cut.Markup.Contains(errorMessage), "Should show an error if there is one.");
+    }
+
+    [Test]
+    public async Task IfNumberIs3ThenShows3()
+    {
+        string errorMessage = "There is an error";
+        Mock<IState<SystemState>> mockState = new Mock<IState<SystemState>>();
+        mockState.Setup(s => s.Value).Returns(new SystemState
+        {
+            Number = 3
+        });
+
+        TestContext.Services.AddTransient<IState<SystemState>>(sp => mockState.Object);
+
+        var cut = Render(@<NumberComponent></NumberComponent>);
+
+        Assert.IsTrue(cut.Markup.Contains("<h1>The Number is: 3</h1>"), "Should be a 3 right now");
+    }
+
+}

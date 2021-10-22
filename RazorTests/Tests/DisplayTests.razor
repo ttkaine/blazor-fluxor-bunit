@@ -1,0 +1,33 @@
+﻿@using NUnit.Framework
+@using Moq
+@using Fluxor
+@using SystemUnderTest.Blazor.Store
+@using Microsoft.Extensions.DependencyInjection
+@inherits BaseTest
+
+@code {
+    [Test]
+    public async Task ATestInAnotherClass()
+    {
+
+        var cut = Render(@<NumberComponent></NumberComponent>);
+
+    }
+
+
+    [Test]
+    public async Task AnotherTestInAnotherClass()
+    {
+        string errorMessage = "There is an error";
+        Mock<IState<SystemState>> mockState = new Mock<IState<SystemState>>();
+        mockState.Setup(s => s.Value).Returns(new SystemState
+        {
+            Number = 2,
+            Error = errorMessage
+        });
+        TestContext.Services.AddTransient<IState<SystemState>>(sp => mockState.Object);
+        var cut = Render(@<NumberComponent></NumberComponent>);
+
+    Assert.IsTrue(cut.Markup.Contains(errorMessage), "Should show an error if there is one.");
+    }
+}
